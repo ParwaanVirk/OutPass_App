@@ -12,53 +12,97 @@ void main() => runApp(MaterialApp(
     ));
 
 class HomePage extends StatefulWidget {
+
   @override
   HomePageState createState() {
     return new HomePageState();
   }
+  
 }
 
 class HomePageState extends State<HomePage> {
   String result = "Hey There !";
   String imageUrl = "";
   bool isImage = false;
-  List<String> emailPhonePurpose;
+  bool isApproved = false;
+  List<String> emailPhonePurposeApproved;
 
-  doAccept() {
-    DateTime now = DateTime.now();
-    DocumentReference docRef = Firestore.instance
-        .collection('users')
-        .document(emailPhonePurpose[0].substring(0, 11))
-        .collection("inout_register")
-        .document();
-    DocumentReference stateRef = Firestore.instance
-        .collection('users')
-        .document(emailPhonePurpose[0].substring(0, 11));
+  doAccept(approved) {
+    if (!approved) {
+      DateTime now = DateTime.now();
+      DocumentReference docRef = Firestore.instance
+          .collection('users')
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .collection("inout_register")
+          .document();
+      DocumentReference stateRef = Firestore.instance
+          .collection('users')
+          .document(emailPhonePurposeApproved[0].substring(0, 11));
+      DocumentReference stateRef2 = Firestore.instance
+          .collection('users_outside')
+          .document(emailPhonePurposeApproved[0].substring(0, 11));
 
-    Firestore.instance.runTransaction((Transaction tx) async {
-      await tx.update(stateRef, {"state": "1"});
-      await tx.set(docRef, {
-        'approved': false,
-        'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
-        'out_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
-        'phone': emailPhonePurpose[1],
-        'purpose': emailPhonePurpose[2],
+      Firestore.instance.runTransaction((Transaction tx) async {
+        await tx.update(stateRef, {"state": "1"});
+        await tx.set(stateRef2, {});
+        await tx.set(docRef, {
+          'approved': false,
+          'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
+          'out_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
+          'phone': emailPhonePurposeApproved[1],
+          'purpose': emailPhonePurposeApproved[2],
+        });
+      }).then((rst) {
+        print(rst);
+        Fluttertoast.showToast(msg: 'Entry Successful');
+        setState(() {
+          isImage = false;
+          imageUrl = "";
+          result = "Hey There !";
+        });
+
+        return true;
+      }).catchError((error) {
+        print("$error");
+        Fluttertoast.showToast(msg: 'Error: $error');
+        return false;
       });
-    }).then((rst) {
-      print(rst);
-      Fluttertoast.showToast(msg: 'Entry Successful');
-      setState(() {
-        isImage = false;
-        imageUrl = "";
-        result = "Hey There !";
-      });
+    } else {
+      DateTime now = DateTime.now();
+      DocumentReference docRef = Firestore.instance
+          .collection('users')
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .collection("inout_register")
+          .document();
+      DocumentReference stateRef = Firestore.instance
+          .collection('users')
+          .document(emailPhonePurposeApproved[0].substring(0, 11));
+      DocumentReference stateRef2 = Firestore.instance
+          .collection('users_outside')
+          .document(emailPhonePurposeApproved[0].substring(0, 11));
 
-      return true;
-    }).catchError((error) {
-      print("$error");
-      Fluttertoast.showToast(msg: 'Error: $error');
-      return false;
-    });
+      Firestore.instance.runTransaction((Transaction tx) async {
+        await tx.update(stateRef, {"state": "0"});
+        await tx.delete(stateRef2);
+        await tx.update(docRef, {
+          'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
+        });
+      }).then((rst) {
+        print(rst);
+        Fluttertoast.showToast(msg: 'Entry Successful');
+        setState(() {
+          isImage = false;
+          imageUrl = "";
+          result = "Hey There !";
+        });
+
+        return true;
+      }).catchError((error) {
+        print("$error");
+        Fluttertoast.showToast(msg: 'Error: $error');
+        return false;
+      });
+    }
   }
 
   doReject() {
@@ -72,17 +116,23 @@ class HomePageState extends State<HomePage> {
   Future _scanQR() async {
     try {
       String qrResult = await BarcodeScanner.scan();
-      qrResult = "2016ucs0005@iitjammu.ac.in_9825192271_guitar";
-      emailPhonePurpose = qrResult.split("_");
+      qrResult = "2016ucs0005@iitjammu.ac.in_9825192271_guitar_1";
+      emailPhonePurposeApproved = qrResult.split("_");
+
       DocumentSnapshot userImgSnap = await Firestore.instance
           .collection("users")
-          .document(emailPhonePurpose[0].substring(0, 11))
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
           .get();
-      print(userImgSnap.data);
+      // print(userImgSnap.data);
       setState(() {
         try {
           imageUrl = userImgSnap.data['imgURL'];
           isImage = true;
+          if (emailPhonePurposeApproved[3] == "1") {
+            isApproved = true;
+          } else {
+            isApproved = false;
+          }
         } catch (e) {
           print(e);
           return false;
@@ -138,7 +188,7 @@ class HomePageState extends State<HomePage> {
                   children: <Widget>[
                     RaisedButton(
                       onPressed: () {
-                        doAccept();
+                        doAccept(isApproved);
                       },
                       child: Text("ACCEPT"),
                       color: Colors.green,

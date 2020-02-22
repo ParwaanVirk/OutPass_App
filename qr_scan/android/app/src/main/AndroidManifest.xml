@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.qr_scan">
-    <uses-permission android:name="andrdoid.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
