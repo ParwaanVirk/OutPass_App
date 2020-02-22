@@ -1,0 +1,93 @@
+{
+  "project_info": {
+    "project_number": "1069912098522",
+    "firebase_url": "https://getout-48150.firebaseio.com",
+    "project_id": "getout-48150",
+    "storage_bucket": "getout-48150.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069912098522:android:1446ce7b87f670bbad47e3",
+        "android_client_info": {
+          "package_name": "ac.in.iitjammu.qr_scan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069912098522-nmvlqbse640s1v16qhdcuhbs4o8vp0ee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ac.in.iitjammu.qr_scan",
+            "certificate_hash": "4048a8002cab1ec5bf8e05abe1f600ca7cabde04"
+          }
+        },
+        {
+          "client_id": "1069912098522-rceia1tui02s786s5t6hibui87rgjoi3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS_X3gF-vQXpaWxAF-zzHFJGJJJAGju1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069912098522-rceia1tui02s786s5t6hibui87rgjoi3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069912098522:android:646c977aaf78abb2ad47e3",
+        "android_client_info": {
+          "package_name": "com.iitjammu.get_out"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069912098522-0ed3td6povfds27n1pvu2kur5cmsq9vg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iitjammu.get_out",
+            "certificate_hash": "4a940c2555689c28f1104c7ee63352b25afc6173"
+          }
+        },
+        {
+          "client_id": "1069912098522-s57on76skv71bilbem03dgt16bdq0fsr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iitjammu.get_out",
+            "certificate_hash": "4048a8002cab1ec5bf8e05abe1f600ca7cabde04"
+          }
+        },
+        {
+          "client_id": "1069912098522-rceia1tui02s786s5t6hibui87rgjoi3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS_X3gF-vQXpaWxAF-zzHFJGJJJAGju1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069912098522-rceia1tui02s786s5t6hibui87rgjoi3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
