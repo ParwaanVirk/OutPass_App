@@ -35,6 +35,17 @@ class HomePageState extends State<HomePage> {
           .document(emailPhonePurposeApproved[0].substring(0, 11))
           .collection("inout_register")
           .document();
+      
+
+      
+      
+      Firestore.instance.collection("expenses").getDocuments().then((onValue){
+        print(onValue.documents.toList());
+      });
+      
+      
+      
+      
       DocumentReference stateRef = Firestore.instance
           .collection('users')
           .document(emailPhonePurposeApproved[0].substring(0, 11));
