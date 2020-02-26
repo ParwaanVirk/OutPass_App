@@ -37,9 +37,7 @@ class HomePageState extends State<HomePage> {
           .document(emailPhonePurposeApproved[0].substring(0, 11))
           .collection("inout_register")
           .document();
-      
-      
-      
+
       DocumentReference stateRef = Firestore.instance
           .collection('users')
           .document(emailPhonePurposeApproved[0].substring(0, 11));
@@ -49,7 +47,7 @@ class HomePageState extends State<HomePage> {
 
       Firestore.instance.runTransaction((Transaction tx) async {
         await tx.update(stateRef, {"state": "2"});
-        await tx.set(stateRef2, {"docRef": docRef.documentID});
+        // await tx.set(stateRef2, {"docRef": docRef.documentID});
         await tx.update(docRef, {
           'approved': true,
           // 'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
@@ -74,94 +72,94 @@ class HomePageState extends State<HomePage> {
       });
     } else {
       DateTime now = DateTime.now();
-      DocumentSnapshot docsnap = await Firestore.instance
-          .collection('users_outside')
+      DocumentReference outsideDocRef = await Firestore.instance
+          .collection("users")
           .document(emailPhonePurposeApproved[0].substring(0, 11))
-          .get();
-      DocumentReference docRef = Firestore.instance
-          .collection('users')
-          .document(emailPhonePurposeApproved[0].substring(0, 11))
-          .collection("inout_register")
-          .document(docsnap.data["docRef"]);
-      DocumentReference stateRef = Firestore.instance
-          .collection('users')
-          .document(emailPhonePurposeApproved[0].substring(0, 11));
-      DocumentReference stateRef2 = Firestore.instance
-          .collection('users_outside')
-          .document(emailPhonePurposeApproved[0].substring(0, 11));
+          .get()
+          .then((onValue) {
+        DocumentReference docRef = Firestore.instance
+            .collection('users')
+            .document(emailPhonePurposeApproved[0].substring(0, 11))
+            .collection("inout_register")
+            .document(onValue.data["docRef"]);
+        DocumentReference stateRef = Firestore.instance
+            .collection('users')
+            .document(emailPhonePurposeApproved[0].substring(0, 11));
+        DocumentReference stateRef2 = Firestore.instance
+            .collection('users_outside')
+            .document(emailPhonePurposeApproved[0].substring(0, 11));
 
-      Firestore.instance.runTransaction((Transaction tx) async {
-        await tx.update(stateRef, {"state": "0"});
-        await tx.delete(stateRef2);
-        await tx.update(docRef, {
-          'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
-        });
-      }).then((rst) {
-        print(rst);
-        Fluttertoast.showToast(msg: 'Entry Successful');
-        setState(() {
-          isImage = false;
-          imageUrl = "";
-          result = "Hey There !";
-        });
+        Firestore.instance.runTransaction((Transaction tx) async {
+          await tx.update(stateRef, {"state": "0"});
+          await tx.delete(stateRef2);
+          await tx.update(docRef, {
+            'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
+          });
+        }).then((rst) {
+          print(rst);
+          Fluttertoast.showToast(msg: 'Entry Successful');
+          setState(() {
+            isImage = false;
+            imageUrl = "";
+            result = "Hey There !";
+          });
 
-        return true;
-      }).catchError((error) {
-        print("$error");
-        Fluttertoast.showToast(msg: 'Error: $error');
-        return false;
+          return true;
+        }).catchError((error) {
+          print("$error");
+          Fluttertoast.showToast(msg: 'Error: $error');
+          return false;
+        });
       });
     }
   }
 
   doReject(approved) async {
-    if(!approved){
-    DocumentSnapshot docsnap = await Firestore.instance
-        .collection('users')
-        .document(emailPhonePurposeApproved[0].substring(0, 11))
-        .get();
-    DocumentReference canceling = Firestore.instance
-        .collection("users")
-        .document(emailPhonePurposeApproved[0].substring(0, 11))
-        .collection("inout_register")
-        .document(docsnap.data['docRef']);
-    DocumentReference docRefdocRef = Firestore.instance
-        .collection("users")
-        .document(emailPhonePurposeApproved[0].substring(0, 11));
-    DocumentSnapshot docSnapdocRef = await Firestore.instance
-        .collection("users")
-        .document(emailPhonePurposeApproved[0].substring(0, 11))
-        .get();
-    Map x = docSnapdocRef.data;
-    x.remove("docRef");
+    if (!approved) {
+      DocumentSnapshot docsnap = await Firestore.instance
+          .collection('users')
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .get();
+      DocumentReference canceling = Firestore.instance
+          .collection("users")
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .collection("inout_register")
+          .document(docsnap.data['docRef']);
+      DocumentReference docRefdocRef = Firestore.instance
+          .collection("users")
+          .document(emailPhonePurposeApproved[0].substring(0, 11));
+      DocumentSnapshot docSnapdocRef = await Firestore.instance
+          .collection("users")
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .get();
+      Map x = docSnapdocRef.data;
+      x.remove("docRef");
 
-    // docSnapdocRef.data.remove("docRef");
-    x["state"] = "0";
-    // print(x);
-    Firestore.instance.runTransaction((Transaction tx) async {
-      await tx.delete(canceling);
-      await tx.set(docRefdocRef, x);
-    }).then((rst) {
-      setState(() {
-      isImage = false;
-      imageUrl = "";
-      result = "Hey There !";
-    });
-      
-    }).catchError((error) {
-      // _state = MyState.Inside;
-      // _isloading = false;
-      // notifyListeners();
-      print("$error");
-      Fluttertoast.showToast(msg: 'Error: $error');
-      return false;
-    });
-    }
-    else{
-      setState(() {
-        isImage = false;
+      // docSnapdocRef.data.remove("docRef");
+      x["state"] = "0";
+      // print(x);
+      Firestore.instance.runTransaction((Transaction tx) async {
+        await tx.delete(canceling);
+        await tx.set(docRefdocRef, x);
+      }).then((rst) {
+        setState(() {
+          isImage = false;
           imageUrl = "";
           result = "Hey There !";
+        });
+      }).catchError((error) {
+        // _state = MyState.Inside;
+        // _isloading = false;
+        // notifyListeners();
+        print("$error");
+        Fluttertoast.showToast(msg: 'Error: $error');
+        return false;
+      });
+    } else {
+      setState(() {
+        isImage = false;
+        imageUrl = "";
+        result = "Hey There !";
       });
     }
   }
