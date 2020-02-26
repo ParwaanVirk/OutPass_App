@@ -220,6 +220,7 @@ class HomePageState extends State<HomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          Container(height: 200, child: ExpenseList()),
           isImage
               ? Image(
                   image: NetworkImage(imageUrl),
@@ -261,5 +262,37 @@ class HomePageState extends State<HomePage> {
         onPressed: _scanQR,
       ),
     );
+  }
+}
+
+class ExpenseList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance.collection("users_outside").snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) return new Text("Loading");
+          return ListView(
+            children: getExpenseItems(snapshot),
+            itemExtent: 40,
+          );
+        });
+  }
+
+  getExpenseItems(AsyncSnapshot<QuerySnapshot> snapshot) {
+    List<DocumentSnapshot> x = snapshot.data.documents;
+    x.removeWhere((item) => item.documentID == "null");
+    if (x.length != 0) {
+      return snapshot.data.documents
+          .map((doc) => ListTile(
+                title: new Text(doc.documentID),
+
+                // subtitle: new Text(doc.documentID)
+              ))
+          .toList();
+    }
+    else{
+      return [ListTile(title:Text("No one is outside"))];
+    }
   }
 }
