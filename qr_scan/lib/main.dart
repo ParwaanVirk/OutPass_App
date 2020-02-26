@@ -12,12 +12,10 @@ void main() => runApp(MaterialApp(
     ));
 
 class HomePage extends StatefulWidget {
-
   @override
   HomePageState createState() {
     return new HomePageState();
   }
-  
 }
 
 class HomePageState extends State<HomePage> {
@@ -27,22 +25,18 @@ class HomePageState extends State<HomePage> {
   bool isApproved = false;
   List<String> emailPhonePurposeApproved;
 
-  doAccept(approved) {
+  doAccept(approved) async {
     if (!approved) {
       DateTime now = DateTime.now();
+      DocumentSnapshot docSnapdocRef = await Firestore.instance
+          .collection("users")
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .get();
       DocumentReference docRef = Firestore.instance
           .collection('users')
           .document(emailPhonePurposeApproved[0].substring(0, 11))
           .collection("inout_register")
           .document();
-      
-
-      
-      
-      Firestore.instance.collection("expenses").getDocuments().then((onValue){
-        print(onValue.documents.toList());
-      });
-      
       
       
       
@@ -54,14 +48,14 @@ class HomePageState extends State<HomePage> {
           .document(emailPhonePurposeApproved[0].substring(0, 11));
 
       Firestore.instance.runTransaction((Transaction tx) async {
-        await tx.update(stateRef, {"state": "1"});
-        await tx.set(stateRef2, {});
-        await tx.set(docRef, {
-          'approved': false,
-          'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
+        await tx.update(stateRef, {"state": "2"});
+        await tx.set(stateRef2, {"docRef": docRef.documentID});
+        await tx.update(docRef, {
+          'approved': true,
+          // 'in_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
           'out_datetime': DateFormat('yyyy-MM-dd-HH:mm:ss').format(now),
-          'phone': emailPhonePurposeApproved[1],
-          'purpose': emailPhonePurposeApproved[2],
+          // 'phone': emailPhonePurposeApproved[1],
+          // 'purpose': emailPhonePurposeApproved[2],
         });
       }).then((rst) {
         print(rst);
@@ -80,11 +74,15 @@ class HomePageState extends State<HomePage> {
       });
     } else {
       DateTime now = DateTime.now();
+      DocumentSnapshot docsnap = await Firestore.instance
+          .collection('users_outside')
+          .document(emailPhonePurposeApproved[0].substring(0, 11))
+          .get();
       DocumentReference docRef = Firestore.instance
           .collection('users')
           .document(emailPhonePurposeApproved[0].substring(0, 11))
           .collection("inout_register")
-          .document();
+          .document(docsnap.data["docRef"]);
       DocumentReference stateRef = Firestore.instance
           .collection('users')
           .document(emailPhonePurposeApproved[0].substring(0, 11));
@@ -116,18 +114,61 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  doReject() {
-    setState(() {
+  doReject(approved) async {
+    if(!approved){
+    DocumentSnapshot docsnap = await Firestore.instance
+        .collection('users')
+        .document(emailPhonePurposeApproved[0].substring(0, 11))
+        .get();
+    DocumentReference canceling = Firestore.instance
+        .collection("users")
+        .document(emailPhonePurposeApproved[0].substring(0, 11))
+        .collection("inout_register")
+        .document(docsnap.data['docRef']);
+    DocumentReference docRefdocRef = Firestore.instance
+        .collection("users")
+        .document(emailPhonePurposeApproved[0].substring(0, 11));
+    DocumentSnapshot docSnapdocRef = await Firestore.instance
+        .collection("users")
+        .document(emailPhonePurposeApproved[0].substring(0, 11))
+        .get();
+    Map x = docSnapdocRef.data;
+    x.remove("docRef");
+
+    // docSnapdocRef.data.remove("docRef");
+    x["state"] = "0";
+    // print(x);
+    Firestore.instance.runTransaction((Transaction tx) async {
+      await tx.delete(canceling);
+      await tx.set(docRefdocRef, x);
+    }).then((rst) {
+      setState(() {
       isImage = false;
       imageUrl = "";
       result = "Hey There !";
     });
+      
+    }).catchError((error) {
+      // _state = MyState.Inside;
+      // _isloading = false;
+      // notifyListeners();
+      print("$error");
+      Fluttertoast.showToast(msg: 'Error: $error');
+      return false;
+    });
+    }
+    else{
+      setState(() {
+        isImage = false;
+          imageUrl = "";
+          result = "Hey There !";
+      });
+    }
   }
 
   Future _scanQR() async {
     try {
       String qrResult = await BarcodeScanner.scan();
-      qrResult = "2016ucs0005@iitjammu.ac.in_9825192271_guitar_1";
       emailPhonePurposeApproved = qrResult.split("_");
 
       DocumentSnapshot userImgSnap = await Firestore.instance
@@ -206,7 +247,7 @@ class HomePageState extends State<HomePage> {
                     ),
                     RaisedButton(
                       onPressed: () {
-                        doReject();
+                        doReject(isApproved);
                       },
                       color: Colors.red,
                       child: Text("REJECT"),
